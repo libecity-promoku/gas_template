@@ -1,0 +1,102 @@
+<script type="text/javascript">
+/** Promise版google.script.run */
+const gasRun = (func, ...args) => {
+  return new Promise((resolve, reject) => {
+    google
+      .script
+      .run
+      .withSuccessHandler((...result) => resolve(...result))
+      .withFailureHandler((...error) => reject(...error))
+    [func](...args);
+  });
+}
+
+/**
+ * 初期化処理
+ */
+const setUp = async () => {
+  // コールバックのセット
+  document.querySelector('#btn_regist').onclick = onRegist;
+
+  // バックエンドからのプロパティを取得
+  //const props = JSON.parse(document.querySelector('#props').textContent);
+  //const contacts = props.contacts ?
+  //  props.contacts :
+  //  (await gasRun('getContacts')).contacts;
+
+  // min - max制御
+  Array.from(document.querySelectorAll('input[type="number"]')).map((e) =>
+    e.addEventListener('focusout', onNumberFocusOut)
+  );
+}
+
+/** 数値部品のmin/max制御 */
+const onNumberFocusOut = function (e) {
+  const val = parseInt(this.value);
+  const min = parseInt(this.getAttribute('min'));
+  const max = parseInt(this.getAttribute('max'));
+
+  if(val < min || isNaN(val))
+    this.value = min;
+  else if(val > max)
+    this.value = max;
+}
+
+// result画面を表示
+const setResult = (text, is_danger = false) => {
+  // ボタンのローディング表示を終了
+  Array.from(document.querySelectorAll('.btn')).map((btn) =>
+    btn.classList.remove('activeLoading')
+  );
+
+  const result = document.querySelector('#result');
+  result.hidden = false;
+  is_danger ?
+    result.classList.replace('alert-success', 'alert-danger') :
+    result.classList.replace('alert-danger', 'alert-success');
+  result.textContent = text;
+}
+
+// ボタンクリック時の設定値を取得
+// パーツのdisable処理を実行
+const onClickHelper = (_) => {
+  document.querySelector('#result').hidden = true;
+  Array.from(document.querySelectorAll('.btn')).map((b) => b.disabled = true);
+
+  const selects = {
+    api_key: document.querySelector('#text1').value,
+  };
+  return selects;
+};
+
+/**
+ * 設定ボタンクリック時
+ */
+const onRegist = async (e) => {
+  const selects = onClickHelper();
+
+  // ボタンをローディング表示
+  const { target: self } = e;
+  self.classList.add('activeLoading');
+
+  gasRun('onSetting', selects)
+    .then(onSuccess)
+    .catch(onFailure);
+};
+
+/** 成功時処理 */
+const onSuccess = (v) => {
+  setResult(v, false);
+  Array.from(document.querySelectorAll('.btn')).map((b) => b.disabled = false);
+}
+
+/** 失敗時処理 */
+const onFailure = (e) => {
+  setResult(e.message, true);
+  Array.from(document.querySelectorAll('.btn')).map((b) => b.disabled = false);
+}
+
+// メイン処理
+setUp();
+
+</script>

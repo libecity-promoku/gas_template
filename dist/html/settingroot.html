@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="jp">
+
+<head>
+  <?!= include('module/cdn') ?>
+  <?!= include('css/styles.css') ?>
+  <base target="_top">
+  <title>Document</title>
+</head>
+
+<body class="bg-light">
+  <div class="container mt-3">
+
+    <!-- 設定値入力フォーム -->
+    <form>
+      <!-- Text -->
+      <div class="form-group">
+        <label for="text1"><i class="fas fa-key"></i> APIキー</label>
+        <input type="text" class="form-control mb-3" id="text1" value="<?= SETTING.api_key ?>">
+      </div>
+    </form>
+
+    <!-- 設定ボタン -->
+    <div class="mt-3 d-flex justify-content-evenly">
+      <button type="button" class="btn btn-primary" id="btn_regist">設定<span class="load loading"></span></button>
+    </div>
+
+    <!-- 実行結果 -->
+    <div class="row m-3">
+      <div class="alert-success mx-auto p-3 mt-3 text-center" id="result" hidden>
+      </div>
+    </div>
+
+    <!-- Spinner -->
+    <div class="d-none justify-content-center" id="bg-area">
+      <div class="spinner-border text-secondary mx-2" role="status" id="spinner"></div>
+      <p class="pt-1 text-secondary" id="loading-text"></p>
+    </div>
+  </div>
+
+  <?!= include('app/setting.js') ?>
+</body>
+
+</html>
+
+
